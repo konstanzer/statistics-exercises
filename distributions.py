@@ -43,19 +43,20 @@ print("\nBinomial")
 ctr = .02
 n = 4326
 k = 97
-print(scs.binom.sf(k, n, ctr)) #.118
+print(scs.binom.sf(k-1, n, ctr)) #.14
 
 r = scs.binom.rvs(n, ctr, size=5000)
 plt.hist(r, bins=30)
 plt.savefig('binomial.png')
 plt.clf()
 
-#getting one right
+#Guessing and getting one right
 print("\nGeometric")
 p = .01
-x = 60
-print(scs.geom.cdf(x, p)) #.453
-print(1-(1-p)**x)
+n = 60
+print(scs.geom.cdf(n, p)) #.453 prob. of 1st success in 1st 60 trials
+print(1-(1-p)**n) #or this
+print(1-scs.binom.pmf(0, n, p)) #
 
 r = scs.geom.rvs(p, size=5000)
 plt.hist(r, bins=100)
@@ -64,19 +65,20 @@ plt.clf()
 
 #looking for a single success therefore geometric again
 p, students = .03, int(66*.9)
-print(scs.geom.cdf(students, p))
-print(scs.geom.sf(2*students, p))
-print(scs.geom.sf(5*students, p))
+print(scs.geom.cdf(students, p)) #.83 prob. cleaned
+print(1-scs.binom.pmf(0, students, p))
+print(scs.geom.sf(2*students, p)) #.03
+print(scs.geom.sf(5*students, p)) #low
 
 print("\nN ~ 30, 6")
 mu, sigma = 15*2, 3*2 #minutes
-#P(X <= 35) acc. for 25 min. needed
+#P(X <= 33) acc. for 15(eat)+10(wait)+2(order) min. needed
 r = scs.norm.rvs(loc=mu, scale=sigma, size=5000)
 plt.hist(r, bins=20)
 plt.savefig('normal2.png')
 plt.clf()
 # cdf means "less than or equal to"
-print(scs.norm.cdf(35, mu, sigma)) #.798
+print(scs.norm.cdf(33, mu, sigma)) #.691
 
 
 #employees db 
