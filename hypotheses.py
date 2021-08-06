@@ -61,9 +61,7 @@ print("Indeed, yes, manual trans gets better city and highway mileage.\n")
 
 '''
 Use telco_churn data: Does tenure correlate with monthly charges? Total charges? What happens if you control for phone and internet service?
-
 Use the employees database: Is there a relationship between how long an employee has been with the company and their salary? Is there a relationship between how long an employee has been with the company and the number of titles they have had?
-
 Use the sleepstudy data: Is there a relationship between days and reaction time?
 '''
 import pandas as pd
@@ -100,17 +98,26 @@ url = get_db_url(username, host, password, 'employees')
 query = """
         SELECT salary, DATEDIFF(now(),employees.hire_date) days
         FROM employees
-        JOIN titles USING(emp_no)
         JOIN salaries USING(emp_no)
         WHERE salaries.to_date > now();
         """
-emps = pd.read_sql(query, url)
-print(emps.head())
+#emps = pd.read_sql(query, url)
+#print(emps.head())
+#res = scs.pearsonr(emps.salary, emps.days)
+#print(f"\ncorr. coeff: {res[0]}")
+#print(f"2-tailed p-value: {res[1]}. Pos. correlation of days & salary\n")
 
-res = scs.pearsonr(emps.salary, emps.days)
-print(f"\ncorr. coeff: {res[0]}")
-print(f"2-tailed p-value: {res[1]}.  Pos. correlation of days & salary\n")
-
+query = """
+        SELECT count(*) titles, DATEDIFF(now(),employees.hire_date) days
+        FROM employees
+        JOIN titles USING(emp_no)
+        GROUP BY title.title;
+        """
+#emps = pd.read_sql(query, url)
+#print(emps.head())
+#res = scs.pearsonr(emps.titles, emps.days)
+#print(f"\ncorr. coeff: {res[0]}")
+#print(f"2-tailed p-value: {res[1]}. Pos. correlation of days & salary\n")
 
 #sleep
 sleep = data('sleepstudy')
@@ -118,7 +125,6 @@ print(sleep.head())
 res = scs.pearsonr(sleep.Days, sleep.Reaction)
 print(f"\ncorr. coeff: {res[0]}")
 print(f"2-tailed p-value: {res[1]}. Yeah, days and reactions are positively correlated.")
-
 
 '''
 Is using a macbook independent from being a codeup student?
@@ -130,5 +136,21 @@ Make chi-square contingency table test for two mpg categorical variables. State 
 
 Use the data from the employees database: Is an employee's gender independent of whether an employee works in sales or marketing? (only look at current employees) Is an employee's gender independent of whether or not they are or have been a manager?
 '''
+observed = pd.DataFrame([[49, 20], [1, 30]], index=['T','F'], columns=['T','F'])
+#H0 Macbook usage us unrelated to whether or not a person is a student.
+#H1 Macbook usage is affected by student status.
+print(observed)
+chi2, p, degf, expected = scs.chi2_contingency(observed)
+print(f"---\nExpected {expected}")
+#a resounding RTN
+print(f'chi^2, p = {chi2, p}')
 
 
+query = """
+        SELECT *
+        FROM employees
+        JOIN titles USING(emp_no)
+        GROUP BY title.title;
+        """
+#emps = pd.read_sql(query, url)
+#print(emps.head())
