@@ -21,22 +21,28 @@ Give examples of type I and type II errors would look like.
     T2 Do not RTN - Ad increased sales, I say it did not
 
 ----------------
-
 A sample of 40 sales from office #1 has a mean of 90 days & a standard deviation of 15 days.
 A sample of 50 sales from office #2 has a mean of 100 days & a standard deviation of 20 days.
 Use a .05 alpha to determine if means are equal.
 
 The Welch's t-test, unlike Student's t-test, does not assume the two populations (in this case the signed in and non-signed in users) from which the samples are drawn have the same variance. By specifying the equal_var argument to be False, ttest_ind becomes Welch's t-test effectively.
-
 scipy.stats.ttest_ind(a, b, equal_var=False)
-
-On the other hand, the Welch's t-test does assume that the two populations are normally distributed.
-
 Using mpg dataset: Is there a difference in fuel-efficiency in cars from 2008 vs 1999? Are compact cars more fuel-efficient than the average car? Do manual cars get better gas mileage than automatic cars?
 '''
 import numpy as np
 import scipy.stats as scs
 from pydataset import data
+
+x1, x2, s1, s2, n1, n2 = 90, 100, 15, 20, 40, 50
+alpha = .05
+degf = n1 + n2 - 2
+s_p = np.sqrt(((n1-1)*s1**2 + (n2-1)*s2**2)/degf) #pooled st. dev.
+t = (x1-x2) / (s_p*np.sqrt((1/n1) + (1/n2))) #-2.6
+p = scs.t(degf).cdf(t)*2 #two-tailed, use cdf because t-stat is negative
+
+print(t, p)
+if p < alpha: print("Reject the null. The means are different.\n")
+else: print("Do not RTN.")
 
 mpg = data('mpg')
 print(mpg.head(2))
@@ -45,7 +51,7 @@ a = mpg.hwy[mpg.year==2008]
 b = mpg.hwy[mpg.year==1999]
 print(np.mean(a), np.mean(b))
 print(f"p-value: {scs.ttest_ind(a, b)[1]}")
-print("There is no f-ing way we can reject the null with either city of highway mileage.\n")
+print("There is no way we can reject the null with either city of highway mileage.\n")
 
 a = mpg.hwy[mpg['class']=='compact']
 b = mpg.hwy[mpg['class']!='compact']
