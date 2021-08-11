@@ -145,19 +145,17 @@ T          49  20
 F          1   30
 
 Make chi-square contingency table test for two mpg categorical variables. State your null and alternative hypotheses.
-
 Use the data from the employees database: Is an employee's gender independent of whether an employee works in sales or marketing? (only look at current employees)
 Is an employee's gender independent of whether or not they are or have been a manager?
 '''
-observed = pd.DataFrame([[49, 20], [1, 30]], index=['T','F'], columns=['T','F'])
+observed = pd.DataFrame([[49, 20], [1, 30]], index=['mac','no mac'], columns=['student','not student'])
 #H0 Macbook usage us unrelated to whether or not a person is a student.
 #H1 Macbook usage is affected by student status.
 print(observed)
 chi2, p, degf, expected = scs.chi2_contingency(observed)
 print(f"---\nExpected {expected}")
-#a resounding RTN
 print(f'chi^2, p = {chi2, p}')
-print("Very low p-value, thereore, reject the null hypothesis that mean mac usages are equal.\n")
+print("\nVery low p-value, thereore, reject the null hypothesis that mean Mac usages are equal and that computer choice is independent of student status.\n")
 
 query = """
         SELECT gender, count(gender), dept_no
@@ -174,13 +172,13 @@ print(observed)
 chi2, p, degf, expected = scs.chi2_contingency(observed)
 print(f"---\nExpected {expected}")
 print(f'chi^2, p = {chi2, p}')
-print("High p-value. Gender is independent of sales and marketing jobs. Do not RTN")
+print("\nHigh p-value. Gender is independent of sales and marketing jobs. Do not RTN")
 
 #I switched = to != to find non-manager counts
 query = """
         SELECT gender, count(gender)
-        FROM employees JOIN dept_emp USING(emp_no)
-        JOIN salaries s USING(emp_no) JOIN titles t USING(emp_no)
+        FROM employees
+        JOIN salaries s USING(emp_no) JOIN titles USING(emp_no)
         WHERE s.to_date > now() AND title = 'Manager'
         GROUP BY gender;
         """
@@ -192,5 +190,5 @@ print(observed)
 chi2, p, degf, expected = scs.chi2_contingency(observed)
 print(f"---\nExpected {expected}")
 print(f'chi^2, p = {chi2, p}')
-print("Gender is independent of managerial roles when alpha is below .22. The expected chi-square is 10 female managers to 14 male manageers, however, we do not RTN\n")
+print("\nGender is independent of managerial roles when alpha is below .22. The expected chi-square is 10 female managers to 14 male manageers, however, we do not RTN\n")
 
